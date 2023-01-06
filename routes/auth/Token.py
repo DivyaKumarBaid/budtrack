@@ -103,9 +103,11 @@ def decode_email_token(token: str):
         payload = jwt.decode(
             token, EMAIL_TOKEN_SECRET_KEY, algorithms=ALGORITHM)
 
+        print(payload)
+
         email: str = payload.get("sub")
 
-        cursor = database.user_col.find_one({"email": email})
+        cursor = database.unverified_user.find_one({"email": email})
 
         if email is None or not cursor:
             raise credentials_exception

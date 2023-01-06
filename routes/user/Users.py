@@ -64,6 +64,8 @@ def verify_user_email(email_token: str):
         user_id=cursor['user_id']
     )
 
+    print(User)
+
     res = database.user_col.insert_one(dict(User))
 
     if not res:

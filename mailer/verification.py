@@ -51,7 +51,7 @@ def email(remail: str):
         <div class="wrapper">
           <p>Thank you for signing up on BudTracker. Please click on the link below to verify your account and stay healthy.</p>
           <br>
-          <a href="{os.getenv('URL')}/verify/{cursor["email_token"]}" style="text-decoration : none;color:white; ">Verify Email!</a>
+          <a href="{os.getenv('URL')}/users/verify/{cursor["email_token"]}" style="text-decoration : none;color:white; ">Verify Email!</a>
         </div>
       </body>
       </html>

@@ -46,9 +46,9 @@ class User_data(BaseModel):
     email: EmailStr = Field(...)
     password: str = Field(...)
     user_id: str = Field(...)
-    created_groups :list[Stored_group] = []
-    invited_groups:list[Stored_group] = []
-    requests:list[list[dict]]
+    created_groups :list[dict] = []
+    invited_groups:list[dict] = []
+    requests:list[list[dict]] = []
     notifications:list[str]=[]
 
 #user signup
