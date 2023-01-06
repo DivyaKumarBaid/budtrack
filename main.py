@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 # from routes.doctor import (Docroute)
 # from routes.doctor import Appointments
 # from routes.doctor import Doc
-# from routes.login import Login
-# from routes.users import Users
+from routes.login import Login
+from routes.user import Users
 
 app = FastAPI()
 
@@ -18,8 +18,8 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-# app.include_router(Login.router)
-# app.include_router(Users.router)
+app.include_router(Login.router)
+app.include_router(Users.router)
 # app.include_router(Doc.router)
 # app.include_router(Appointments.router)
 # app.include_router(Docroute.router)

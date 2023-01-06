@@ -7,12 +7,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def email(remail: str,doctor:bool):
+def email(remail: str):
 
-    if doctor:
-      cursor = database.unverified_doc.find_one({"email": remail})
-    else:
-      cursor = database.unverified_user.find_one({"email": remail})
+    cursor = database.unverified_user.find_one({"email": remail})
     if not cursor:
         return
 
@@ -24,7 +21,7 @@ def email(remail: str,doctor:bool):
     message['From'] = sender_address
     message['To'] = receiver_address
     # The subject line
-    message['Subject'] = 'Well-Being Welcomes you to the family'
+    message['Subject'] = 'BudTracker Welcomes you to the family'
 
     # Setup the MIME
 
@@ -52,9 +49,9 @@ def email(remail: str,doctor:bool):
       </head>
       <body>
         <div class="wrapper">
-          <p>Thank you for signing up on Well-Being. Please click on the link below to verify your account and stay healthy.</p>
+          <p>Thank you for signing up on BudTracker. Please click on the link below to verify your account and stay healthy.</p>
           <br>
-          <a href="https://hackathoniitp.herokuapp.com/users/email_verification/{cursor["email_token"]}" style="text-decoration : none;color:white; ">Verify Email!</a>
+          <a href="{os.getenv('URL')}/verify/{cursor["email_token"]}" style="text-decoration : none;color:white; ">Verify Email!</a>
         </div>
       </body>
       </html>
