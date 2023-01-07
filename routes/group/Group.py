@@ -93,49 +93,71 @@ def delete_group(group_id:str,current_user: User = Depends(oauth2.get_current_us
 @router.post('/add',status_code=202)
 def add_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_user)):
 
-    try:
-
+    # try:
         cursor = database.groups.find_one({'group_id':req.group_id})
         if(cursor['admin']['email']!=current_user.email):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         part_arr = cursor['participants']
         for p in part_arr:
-            if(p['email']==req.email):
+            if(p['email'] in req.email):
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT)
             p['amount'] = float((cursor['amount']*1.0)/(len(part_arr)+1))
-
-        cursor1 = database.user_col.find_one({'email':req.email})
-
-        # updating the participant invited group array
-        if(cursor1):
+        
+        # updating participation list
+        for mails in req.email:
+            cursor1 = database.user_col.find_one({'email':mails})
             part_arr.append(dict(User_Info_Group(
-                user_id=cursor1['user_id'],
-                email = cursor1['email'],
-                amount = float((cursor['amount']*1.0)/(len(part_arr)+1))
+                    user_id=cursor1['user_id'],
+                    email = cursor1['email'],
+                    amount = float((cursor['amount']*1.0)/(len(part_arr)+1))
             )))
 
-            group_info = Stored_group(
-                subject=cursor['subject'],
-                amount=cursor['amount'],
-                created_on=cursor['created_on'],
-                group_id=cursor['group_id'],
-                admin=cursor['admin'],
-                participants=part_arr
-            )
-            new_array = cursor1['invited_groups']
-            new_array.insert(0,dict(group_info))
-            cursor2 = database.user_col.find_one_and_update({'email':req.email},{'$set':{'invited_groups':new_array}})
+        group_info = Stored_group(
+            subject=cursor['subject'],
+            amount=cursor['amount'],
+            created_on=cursor['created_on'],
+            group_id=cursor['group_id'],
+            admin=cursor['admin'],
+            participants=part_arr
+        )
 
-            cursor2 = database.groups.find_one_and_update({'group_id':req.group_id},{'$set':{'participants':part_arr}})
+        # for new added people
+        for mails in req.email:
+            cursor1 = database.user_col.find_one({'email':mails})
+            # updating the participant invited group array
+            if(cursor1):
+                new_array = cursor1['invited_groups']
+                new_array.insert(0,dict(group_info))
+                cursor2 = database.user_col.find_one_and_update({'email':mails},{'$set':{'invited_groups':new_array}})
 
-            grp_cre.email("added",current_user.email,[req.email],cursor['subject'])
+        # for already existing people
+        for mails in cursor['participants']:
+            existing_cursor = database.user_col.find_one({'email':mails['email']})
+            existing_grps = existing_cursor['invited_groups']
+            for grps in range(0,len(existing_grps)):
+                if(existing_grps[grps]['group_id'] == req.group_id):
+                    existing_grps[grps]['participants'] = part_arr
+            cursor2 = database.user_col.find_one_and_update({'email':mails['email']},{'$set':{'invited_groups':existing_grps}})
+        
+        # for admin
+        existing_cursor = database.user_col.find_one({'email':cursor['admin']['email']})
+        existing_grps = existing_cursor['created_groups']
+        for grps in range(0,len(existing_grps)):
+            if(existing_grps[grps]['group_id'] == req.group_id):
+                existing_grps[grps]['participants'] = part_arr
+        cursor2 = database.user_col.find_one_and_update({'email':cursor['admin']['email']},{'$set':{'created_groups':existing_grps}})
 
-    except:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # updating group
+        cursor2 = database.groups.find_one_and_update({'group_id':req.group_id},{'$set':{'participants':part_arr}})
+
+        grp_cre.email("added",current_user.email,req.email,cursor['subject'])
+
+    # except:
+    #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @router.post('/remove',status_code=202)
 def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_user)):
-    try:
+    # try:
         # checking if admin is removing
         cursor = database.groups.find_one({'group_id':req.group_id})
         if(cursor['admin']['email']!=current_user.email):
@@ -174,7 +196,7 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
             # updating the participant invited group array
             if(cursor1):
                 invited_arr = cursor1['invited_groups']
-                for grps in range(0,invited_arr):
+                for grps in range(0,len(invited_arr)):
                     if(invited_arr[grps]['group_id']==req.group_id):
                         invited_arr.pop(grps)
 
@@ -189,6 +211,6 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
 
         grp_cre.email("removed",current_user.email,req.email,cursor['subject'])
 
-    except:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # except:
+    #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
