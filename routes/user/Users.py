@@ -1,12 +1,15 @@
 from fastapi import Depends, APIRouter, HTTPException, status
 import config.database as database
 import uuid
-from routes.user.models import (Pre_userdata, User, User_data)
+from routes.user.models import (Pre_userdata, User, User_data,Search_User,Res_Search_User)
 from routes.login.models import (IntervalToken_inc, IntervalToken_res)
 import mailer.verification as mailer
+import mailer.html_res as html_res
 import routes.auth.hashing as hashing
-from routes.auth import Token
+from routes.auth import (Token,oauth2)
+import bson
 import os
+from fastapi.responses import HTMLResponse
 
 router = APIRouter(tags=["Users"], prefix="/users")
 
@@ -47,37 +50,34 @@ def create_user(inc_user: User):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@router.get("/verify/{email_token}", status_code=200)
+@router.get("/verify/{email_token}", response_class=HTMLResponse)
 def verify_user_email(email_token: str):
-    # try:
-    payload = Token.decode_email_token(email_token)
-    email:str = payload.get("sub")
-    cursor = database.unverified_user.find_one({"email": email})
-    isValid = Token.verify_email_token(email_token)
-    if not cursor or not isValid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    try:
+        payload = Token.decode_email_token(email_token)
+        email:str = payload.get("sub")
+        cursor = database.unverified_user.find_one({"email": email})
+        isValid = Token.verify_email_token(email_token)
+        if not cursor or not isValid:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    User = User_data(
-        user=cursor['user'],
-        email=cursor['email'],
-        password=cursor['password'],
-        user_id=cursor['user_id']
-    )
+        User = User_data(
+            user=cursor['user'],
+            email=cursor['email'],
+            password=cursor['password'],
+            user_id=cursor['user_id']
+        )
+        res = database.user_col.insert_one(dict(User))
 
-    print(User)
+        if not res:
+            return html_res.html_respose("Link Expired !")
 
-    res = database.user_col.insert_one(dict(User))
+        delete = database.unverified_user.delete_one({"email": cursor["email"]})
+        if not delete:
+            return html_res.html_respose("Something Went Wrong!")
 
-    if not res:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    delete = database.unverified_user.delete_one({"email": cursor["email"]})
-    if not delete:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    raise HTTPException(status_code=status.HTTP_201_CREATED)
+        return html_res.html_respose("Verified !")
+    except:
+        return html_res.html_respose("Link Expired !")
 
 
 # returns accesstoken
@@ -91,5 +91,18 @@ def verify_user_refresh_token(rtoken: IntervalToken_inc):
 
         return IntervalToken_res(access_token=token)
 
+    except:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@router.post("/search",status_code=200)
+def search_user(req:Search_User,current_user: User = Depends(oauth2.get_current_user)):
+    try:
+        regx = bson.regex.Regex('^foo')
+        cursor = database.user_col.find({'email':{'$regex':f'^{req.email}'}})
+        list_users = []
+        if(cursor):
+            for i in cursor:
+                list_users.append(Res_Search_User(**i))
+        return list_users    
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

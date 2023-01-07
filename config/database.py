@@ -12,6 +12,7 @@ database = client.budtrack
 
 user_col = database.users
 unverified_user = database.unverified_user
+groups = database.groups
 
 # openssl rand -hex 32 to randomly generate JWT SECRET
 
