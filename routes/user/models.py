@@ -28,7 +28,7 @@ class User(BaseModel):
 
 #search user
 class Search_User(BaseModel):
-    email: EmailStr=Field(...)
+    email: str=Field(...)
 
 #search user
 class Res_Search_User(BaseModel):

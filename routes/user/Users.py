@@ -97,8 +97,8 @@ def verify_user_refresh_token(rtoken: IntervalToken_inc):
 @router.post("/search",status_code=200)
 def search_user(req:Search_User,current_user: User = Depends(oauth2.get_current_user)):
     try:
-        regx = bson.regex.Regex('^foo')
-        cursor = database.user_col.find({'email':{'$regex':f'^{req.email}'}})
+        # regx = bson.regex.Regex('')
+        cursor = database.user_col.find({'email':{'$regex':f'{req.email}'}})
         list_users = []
         if(cursor):
             for i in cursor:

@@ -33,3 +33,8 @@ class Stored_group(BaseModel):
     # admin:User_Info_Group=Field(...)
     participants:list[dict] = Field(...)
     # participants=list[User_Info_Group]
+
+# add user to group
+class Req_user_add(BaseModel):
+    group_id:str=Field(...)
+    email:list[EmailStr]=Field(...)
