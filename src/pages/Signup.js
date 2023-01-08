@@ -58,8 +58,7 @@ export const Signup = () => {
             })
             .catch(err => {
                 setLoad(false);
-                console.log(err)
-                enqueueSnackbar('e', { variant: 'error' })
+                enqueueSnackbar(err, { variant: 'error' })
                 return
             })
     }
