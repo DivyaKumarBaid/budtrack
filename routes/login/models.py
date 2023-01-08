@@ -10,6 +10,7 @@ class Login(BaseModel):
 #from backend to frontend after login
 class ResLogin(BaseModel):
     user: str = Field(...)
+    email:EmailStr=Field(...)
     user_id: str = Field(...)
     access_token: str = Field(...)
     refresh_token: str = Field(...)

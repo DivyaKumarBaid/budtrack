@@ -32,7 +32,12 @@ def login(info: OAuth2PasswordRequestForm = Depends()):
                 "user_id": cursor["user_id"]
             })
             res = ResLogin(
-                user_id=cursor["user_id"], access_token=token['access_token'], token_type=token['token_type'], user=cursor['user'], refresh_token=token['refresh_token']
+                user_id=cursor["user_id"], 
+                access_token=token['access_token'], 
+                token_type=token['token_type'], 
+                user=cursor['user'], 
+                refresh_token=token['refresh_token'],
+                email=cursor["email"]
             )
 
             return res
