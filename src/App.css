@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500&display=swap');
+/* font-family: 'Noto Sans', sans-serif; */
+
+@import url('https://fonts.googleapis.com/css2?family=Martel+Sans:wght@800&family=Space+Mono&display=swap');
+
+/* font-family: 'Martel Sans', sans-serif; */
+/* font-family: 'Space Mono', monospace; */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+/* font-family: 'Montserrat', sans-serif; */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+/* font-family: 'Roboto Mono', monospace; */
+/* google fonts */
+
+*{
+  padding: 0;
+  margin: 0;
+}
+
+:root{
+  --border: #ff985472;
+  --colBackground: #ff9854;
+  --bgCol: rgb(248, 248, 248);
+}
+/* scroll bar */
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgb(26, 26, 26);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--colBackground);
+  border-radius:8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+
+}
+.App{
+  width: 100%;
+  padding-left: 5vw;
+}
+/* nav bar */
+.navContainer{
+  width: 5vw;
+  background-color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: fixed;
+  z-index: 10;
+  border-right: 0.25px solid rgba(128, 128, 128, 0.192);
+  font-family: "Raleway", "Lora", sans-serif;
+  filter: drop-shadow(0px 3px 3px rgba(128, 128, 128, 0.4));
+  justify-content: space-between;
+}
+.navBasics,.navLinks{
+  height: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.navLogos{
+  font-size: 25px;
+  cursor: pointer;
+}
+/* nav bar */
+
+/* login and signup page */
+.login-container{
+  width: 100%;
+  height: 100vh;
+  background-color:white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login-card{
+  font-family:'Noto Sans', sans-serif; 
+  width: 25vw;
+  height: 75vh;
+  background-color: white;
+  box-shadow: 0px 0px 8px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px;
+  /* border: 1px solid var(--border) ; */
+}
+.login-welcome{
+  color: rgba(0,0,0,0.7);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-family:'Noto Sans', sans-serif; 
+}
+.login-indications{
+  color: rgba(0,0,0,0.8);
+  font-size: 0.9rem;
+  margin-top: 5px;
+  font-weight: 400;
+  font-family:'Noto Sans', sans-serif; 
+}
+.login-card input{
+  background-color:var(--bgCol) ;
+  padding: 5px 8px;
+  width: 80%;
+  border: 2px solid var(--bgCol);
+  margin: 5px;
+  transition: border 0.3s;
+  border-radius: 3px;
+}
+.login-card input:focus{
+  transition: border 0.3s;
+  outline: none;
+  border-bottom: 2px solid var(--border);
+}
+.login-instructions{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.no-acc{
+  font-size: 0.85rem;
+}
+.login-link{
+  border-bottom: 1px solid var(--colBackground);
+}
+.submit-btn{
+  background-color: var(--colBackground);
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+
+  box-shadow: 0px 0px 8px rgba(0,0,0,0.2);
+}
+.login-image{
+  width: 80%;
+}
+.password-eye{
+  width: 80%;
+  background-color: var(--bgCol);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.password-eye input{
+  padding-left: 0px;
+}
+
+
+/* media query */
+@media screen and (max-width: 720px) {
+  .navContainer{
+    filter: drop-shadow(-3px 0px 3px rgba(128, 128, 128, 0.4));
+    top: 92vh;
+    width: 100%;
+    height: 8vh;
+  }
+  .navContainer,.navBasics,.navLinks{
+    flex-direction: row;
+    align-items: center ;
+  }
+  .navBasics a{
+    display: flex;
+    align-items: center;
+  }
+  .navLinks,.navBasics{
+    width: 30%;
+  }
+  .navLogos{
+    width: 25px;
+    cursor: pointer;
+  }
+  .App{
+    padding-left: 0px;
+  }
+}
+/* media query */
