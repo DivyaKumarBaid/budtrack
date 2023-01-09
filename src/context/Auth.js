@@ -23,6 +23,11 @@ export const Auth = ({ children }) => {
     })
 
     const fetch_access = () => {
+        if (user.access_token === '' || user.refresh_token === '') {
+            loggedIn && setLoggedIn(false);
+            setAuthLoading(false);
+            return
+        }
         setAuthLoading(true)
         const url = process.env.REACT_APP_BASE_URL + '/users/user_verification';
         let msg_body = {
@@ -67,11 +72,12 @@ export const Auth = ({ children }) => {
     }, [])
 
     useEffect(() => {
-        const regen_access_token = setInterval(() => {
+        setInterval(() => {
+            console.log("idk whats happening")
             fetch_access();
         }, (1000 * 20 * 60));
 
-        return () => clearInterval(regen_access_token);
+        // return () => clearInterval(regen_access_token);
     }, []);
 
     return (

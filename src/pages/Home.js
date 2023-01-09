@@ -7,7 +7,7 @@ export const Home = () => {
     const { loggedIn, setLoggedIn, authLoading, user, setUser } = AuthLogin();
 
     return (
-        authLoading ? <div className="w-[100%] h-[100vh] justify-center items-center"><CircularProgress /></div> :
+        authLoading ? <div className="w-[100%] h-[100vh] flex justify-center items-center"><CircularProgress /></div> :
             loggedIn ?
                 <div> Home</div > :
                 <Hero />
