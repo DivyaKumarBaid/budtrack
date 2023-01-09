@@ -7,6 +7,7 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import './App.css';
 import { Nav } from "./components/Nav"
+import { LogoNav } from "./components/LogoNav";
 
 function App() {
   // using snackbar
@@ -16,6 +17,7 @@ function App() {
     <Auth>
       <SnackbarProvider autoHideDuration={5000} maxSnack={3}>
         <Nav />
+        <LogoNav />
         <div className="App">
           <Router>
             <Routes>
