@@ -6,8 +6,14 @@ export const AuthLogin = () => useContext(Login);
 
 export const Auth = ({ children }) => {
 
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [loggedIn, setLogged] = useState(false);
     const [authLoading, setAuthLoading] = useState(true);
+
+    const setLoggedIn = (flag) => {
+        !flag && setUser({})
+        !flag && localStorage.clear();
+        loggedIn !== flag && setLogged(flag);
+    }
 
     const [user, setUser] = useState({
         email: localStorage.getItem('email') || '',
@@ -17,6 +23,7 @@ export const Auth = ({ children }) => {
     })
 
     const fetch_access = () => {
+        setAuthLoading(true)
         const url = process.env.REACT_APP_BASE_URL + '/users/user_verification';
         let msg_body = {
             method: 'POST',
@@ -35,21 +42,24 @@ export const Auth = ({ children }) => {
                 return res.json()
             })
             .then(data => {
+                !loggedIn && setLoggedIn(true);
                 localStorage.setItem('access_token', JSON.stringify(data));
                 setUser(prev => {
                     return { ...prev, access_token: data }
                 })
+                setAuthLoading(false);
             })
             .catch(e => {
                 setUser({})
                 localStorage.clear();
-                (window.location.pathname !== '/login' && window.location.pathname !== '/signup') && window.location.replace(window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + '/login')
+                loggedIn && setLoggedIn(false);
+                setAuthLoading(false);
             })
     }
     useEffect(() => {
         if (user.access_token === '' || user.refresh_token === '') {
-            // console.log("idk what went wrong")
-            (window.location.pathname !== '/login' && window.location.pathname !== '/signup') && window.location.replace(window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + '/login')
+            loggedIn && setLoggedIn(false);
+            setAuthLoading(false);
         }
         else {
             fetch_access();

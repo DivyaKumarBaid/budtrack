@@ -7,7 +7,6 @@ import { AuthLogin } from '../context/Auth';
 export function Nav(props) {
 
     const { loggedIn, setLoggedIn, authLoading, user, setUser } = AuthLogin();
-
     return (
         <div className={`navContainer`} >
             <div className="navLinks">

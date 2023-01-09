@@ -21,6 +21,8 @@ export const Signup = () => {
     const [showPass, setShow] = React.useState(false);
 
     const handleSubmit = () => {
+        if (subLoad)
+            return
         setLoad(true);
         console.log(subLoad)
         if (value.password !== value.cpassword) {

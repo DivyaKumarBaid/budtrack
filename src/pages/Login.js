@@ -13,6 +13,9 @@ export const Login = () => {
     const { loggedIn, setLoggedIn, authLoading, user, setUser } = AuthLogin();
 
     const handleSubmit = () => {
+        if (subLoad)
+            return
+        setLoad(true);
         const url = process.env.REACT_APP_BASE_URL + '/Login';
         let msg_body = {
             method: 'POST',
@@ -23,6 +26,7 @@ export const Login = () => {
         }
         fetch(url, msg_body)
             .then(res => {
+                setLoad(false);
                 if (res.status !== 200 && res.status !== 201 && res.status !== 202)
                     throw Error("Something went wrong!")
                 setLoad(false);
@@ -35,7 +39,7 @@ export const Login = () => {
                 localStorage.setItem('email', JSON.stringify(data.email));
                 localStorage.setItem('user_id', JSON.stringify(data.user_id));
                 setUser(data);
-                // window.location.replace(window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + '/')
+                window.location.replace(window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + '/')
             })
             .catch(err => {
                 setLoad(false);
