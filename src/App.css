@@ -271,7 +271,6 @@
     padding-left: 0px;
   }
   .hero-container{
-    align-items: flex-start;
     text-align: center;
   }
   .hero-text{
@@ -279,7 +278,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 70vw;
+    width: 72vw;
   }
   .hero-image{
     display: none;
@@ -288,7 +287,7 @@
     font-size: 2.5rem;
   }
   .hero-para{
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
   .login-card{
     width: 85vw;
