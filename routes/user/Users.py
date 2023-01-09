@@ -49,6 +49,16 @@ def create_user(inc_user: User):
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@router.post('/get_user_details',status_code=200)
+def get_user_details(req:Search_User,current_user: User = Depends(oauth2.get_current_user)):
+    try:
+        if (current_user.email != req.email):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        cursor = database.user_col.find_one({"email":req.email})
+        if(cursor):
+            return User_data(**cursor)
+    except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @router.get("/verify/{email_token}", response_class=HTMLResponse)
 def verify_user_email(email_token: str):
@@ -78,7 +88,6 @@ def verify_user_email(email_token: str):
         return html_res.html_respose("Verified !")
     except:
         return html_res.html_respose("Link Expired !")
-
 
 # returns accesstoken
 @router.post("/user_verification", status_code=200)
