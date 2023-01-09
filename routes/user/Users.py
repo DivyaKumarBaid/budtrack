@@ -58,7 +58,7 @@ def get_user_details(req:Search_User,current_user: User = Depends(oauth2.get_cur
         if(cursor):
             return User_data(**cursor)
     except:
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @router.get("/verify/{email_token}", response_class=HTMLResponse)
 def verify_user_email(email_token: str):
