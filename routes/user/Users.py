@@ -1,7 +1,7 @@
 from fastapi import Depends, APIRouter, HTTPException, status
 import config.database as database
 import uuid
-from routes.user.models import (Pre_userdata, User, User_data,Search_User,Res_Search_User)
+from routes.user.models import (Pre_userdata, User, User_data,Search_User,Res_Search_User,User_details)
 from routes.login.models import (IntervalToken_inc, IntervalToken_res)
 import mailer.verification as mailer
 import mailer.html_res as html_res
@@ -56,7 +56,7 @@ def get_user_details(req:Search_User,current_user: User = Depends(oauth2.get_cur
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         cursor = database.user_col.find_one({"email":req.email})
         if(cursor):
-            return User_data(**cursor)
+            return User_details(**cursor)
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

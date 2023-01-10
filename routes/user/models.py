@@ -20,6 +20,15 @@ class User_data(BaseModel):
     requests:list[list[dict]] = []
     notifications:list[str]=[]
 
+class User_details(BaseModel):
+    user: str = Field(...)
+    email: EmailStr = Field(...)
+    user_id: str = Field(...)
+    created_groups:list[dict] = []
+    invited_groups:list[dict] = []
+    requests:list[list[dict]] = []
+    notifications:list[str]=[]
+
 #user signup
 class User(BaseModel):
     user: str = Field(...)
