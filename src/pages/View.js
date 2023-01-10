@@ -146,7 +146,7 @@ export const View = () => {
                 return res.json()
             })
             .then(data => {
-                enqueueSnackbar('Successfully created !', { variant: 'error' })
+                enqueueSnackbar('Successfully created !', { variant: 'success' })
                 window.location.reload()
             })
             .catch(e => {
