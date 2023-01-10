@@ -85,12 +85,15 @@ def delete_group(group_id:str,current_user: User = Depends(oauth2.get_current_us
 
         # removing the group from the user obj of the participants   
         for part in cursor['participants']:
-            cursor = database.user_col.find_one({"email":part['email']})
-            new_array = cursor['invited_groups']
-            for i in range(0,len(new_array)):
-                if(new_array[i]['group_id']==group_id):
-                    new_array.pop(i)
-            cursor2 = database.user_col.find_one_and_update({'email':part['email']},{'$set':{'invited_groups':new_array}})
+            try:
+                cursor = database.user_col.find_one({"email":part['email']})
+                new_array = cursor['invited_groups']
+                for i in range(0,len(new_array)):
+                    if(new_array[i]['group_id']==group_id):
+                        new_array.pop(i)
+                cursor2 = database.user_col.find_one_and_update({'email':part['email']},{'$set':{'invited_groups':new_array}})
+            except:
+                continue
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -108,13 +111,24 @@ def add_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_us
             p['amount'] = float((cursor['amount']*1.0)/(len(part_arr)+1))
         
         # updating participation list
+
+        new_non_part = []
+
         for mails in req.email:
-            cursor1 = database.user_col.find_one({'email':mails})
-            part_arr.append(dict(User_Info_Group(
-                    user_id=cursor1['user_id'],
-                    email = cursor1['email'],
-                    amount = float((cursor['amount']*1.0)/(len(part_arr)+1))
-            )))
+            try:
+                cursor1 = database.user_col.find_one({'email':mails})
+                part_arr.append(dict(User_Info_Group(
+                        user_id=cursor1['user_id'],
+                        email = cursor1['email'],
+                        amount = float((cursor['amount']*1.0)/(len(part_arr)+1))
+                )))
+                new_non_part.append(mails)
+            except:
+                part_arr.append(dict(User_Info_Group(
+                        user_id = req.email,
+                        email = req.email,
+                        amount = float((cursor['amount']*1.0)/(len(part_arr)+1))
+                )))
 
         group_info = Stored_group(
             subject=cursor['subject'],
@@ -127,12 +141,15 @@ def add_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_us
 
         # for new added people
         for mails in req.email:
-            cursor1 = database.user_col.find_one({'email':mails})
-            # updating the participant invited group array
-            if(cursor1):
-                new_array = cursor1['invited_groups']
-                new_array.insert(0,dict(group_info))
-                cursor2 = database.user_col.find_one_and_update({'email':mails},{'$set':{'invited_groups':new_array}})
+            try:
+                cursor1 = database.user_col.find_one({'email':mails})
+                # updating the participant invited group array
+                if(cursor1):
+                    new_array = cursor1['invited_groups']
+                    new_array.insert(0,dict(group_info))
+                    cursor2 = database.user_col.find_one_and_update({'email':mails},{'$set':{'invited_groups':new_array}})
+            except:
+                continue
 
         # for already existing people
         for mails in cursor['participants']:
@@ -154,7 +171,7 @@ def add_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_us
         # updating group
         cursor2 = database.groups.find_one_and_update({'group_id':req.group_id},{'$set':{'participants':part_arr}})
 
-        grp_cre.email("added",current_user.email,req.email,cursor['subject'])
+        grp_cre.email("added",current_user.email,new_non_part,cursor['subject'])
 
     # except:
     #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -172,18 +189,20 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
         for p in range(0,len(part_arr)):
             if(part_arr[p]['email'] in req.email):
                 part_arr.pop(p)
-                flag = False
-                continue
-            part_arr[p]['amount'] = float((cursor['amount']*1.0)/(len(part_arr)-1))
+            else:
+                part_arr[p]['amount'] = float((cursor['amount']*1.0)/(len(part_arr)-1))
         
         # editing peoples participating
         for people in part_arr:
-            cursor_people = database.user_col.find_one({'email':people['email']})
-            invited_grps = cursor_people['invited_groups']
-            for grp in range(0,len(invited_grps)):
-                if(invited_grps[grp]['group_id']==req.group_id):
-                    invited_grps[grp]['participants'] = part_arr
-            cursor_people = database.user_col.find_one_and_update({'email':people['email']},{'$set':{'invited_groups':invited_grps}})
+            try:
+                cursor_people = database.user_col.find_one({'email':people['email']})
+                invited_grps = cursor_people['invited_groups']
+                for grp in range(0,len(invited_grps)):
+                    if(invited_grps[grp]['group_id']==req.group_id):
+                        invited_grps[grp]['participants'] = part_arr
+                cursor_people = database.user_col.find_one_and_update({'email':people['email']},{'$set':{'invited_groups':invited_grps}})
+            except:
+                continue
         
         # for admin
         cursor_admin = database.user_col.find_one({'email':cursor['admin']['email']})
@@ -194,26 +213,27 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
         cursor_admin = database.user_col.find_one_and_update({'email':cursor['admin']['email']},{'$set':{'created_groups':created_grps}})
         
 
+        rem_arr = []
         # removing from the removed participants
         for mails in req.email:
-            cursor1 = database.user_col.find_one({'email':mails})
-            # updating the participant invited group array
-            if(cursor1):
+            try:
+                cursor1 = database.user_col.find_one({'email':mails})
+                # updating the participant invited group array
+                rem_arr.append(mails)
                 invited_arr = cursor1['invited_groups']
                 for grps in range(0,len(invited_arr)):
                     if(invited_arr[grps]['group_id']==req.group_id):
                         invited_arr.pop(grps)
-
                 cursor2 = database.user_col.find_one_and_update({'email':mails},{'$set':{'invited_groups':invited_arr}})
-                if not cursor2 : 
-                    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except:
+                continue
                 
         cursor3 = database.groups.find_one_and_update({'group_id':req.group_id},{'$set':{'participants':part_arr}})
             
         if not cursor3:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        grp_cre.email("removed",current_user.email,req.email,cursor['subject'])
+        grp_cre.email("removed",current_user.email,rem_arr,cursor['subject'])
 
     # except:
     #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
