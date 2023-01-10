@@ -41,6 +41,7 @@ export const View = () => {
 
     const [searchRes, setRes] = React.useState([]) //stores search result
     const [added, setAdded] = React.useState([]) //add participants
+    const [fieldEmail, setFieldEmail] = React.useState("")
 
     const fetch_user = (emailAdd) => {
         if (emailAdd === "")
@@ -116,12 +117,6 @@ export const View = () => {
             enqueueSnackbar('Subject is Missing', { variant: 'error' })
             return false
         }
-        // console.log(added)
-        // setPart((prev) => {
-        //     return added.map((p) => {
-        //         return { ...p, amount: groupInfo.amount / added.length }
-        //     })
-        // })
         setAdded((prev) => prev.map((pre) => {
             return ({ ...pre, amount: (groupInfo.amount / added.length) })
         }))
@@ -160,6 +155,7 @@ export const View = () => {
     }
 
     const closeDialogue = () => {
+        setFieldEmail('')
         setCreate(false)
         setPart([])
         setRes([])
@@ -217,6 +213,7 @@ export const View = () => {
                             value={groupInfo.email}
                             onChange={(event) => {
                                 fetch_user(event.target.value)
+                                setFieldEmail(event.target.value)
                             }}
                             autoFocus
                             margin="dense"
@@ -232,27 +229,43 @@ export const View = () => {
                         </DialogContentText>
 
                         <DialogContentText>
-                            <div className="profile-container"></div>
-                            {searchRes.map((par, idx) => {
-                                const isAdded = added.filter((ele) => ele.email === par.email).length
-                                if (isAdded === 0) {
-                                    return (
-                                        <div className="profile-wrapper"
-                                            onClick={() => {
-                                                setAdded((prev) => {
-                                                    return [...prev, { ...par }]
-                                                })
-                                                setRes((res) => res.filter((x, y) => y !== idx))
-                                            }}
-                                        >
-                                            <span>{par.email}</span>
-                                            <BsPlusCircleDotted />
-                                        </div>
-                                    )
-                                }
-                                else
-                                    return <></>
-                            })}
+                            <div className="profile-container">
+                                {searchRes.map((par, idx) => {
+                                    const isAdded = added.filter((ele) => ele.email === par.email).length
+                                    if (isAdded === 0) {
+                                        return (
+                                            <div className="profile-wrapper"
+                                                onClick={() => {
+                                                    setAdded((prev) => {
+                                                        return [...prev, { ...par }]
+                                                    })
+                                                    setRes((res) => res.filter((x, y) => y !== idx))
+                                                }}
+                                            >
+                                                <span>{par.email}</span>
+                                                <BsPlusCircleDotted />
+                                            </div>
+                                        )
+                                    }
+                                    else
+                                        return <></>
+                                })}
+                            </div>
+                            {fieldEmail === '' &&
+                                <div className="profile-wrapper"
+                                    onClick={() => {
+                                        setAdded((prev) => {
+                                            return [...prev, {
+                                                email: `${fieldEmail}@budtracker.com`,
+                                                user_id: fieldEmail
+                                            }]
+                                        })
+                                    }}
+                                >
+                                    <span>{fieldEmail}</span>
+                                    <BsPlusCircleDotted />
+                                </div>
+                            }
                         </DialogContentText>
 
                         <DialogContentText>
