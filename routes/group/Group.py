@@ -78,9 +78,16 @@ def delete_group(group_id:str,current_user: User = Depends(oauth2.get_current_us
         #removing the group from the user obj of admin    
         cursor2 = database.user_col.find_one({'email':cursor['admin']['email']})
         prev_arr = cursor2['created_groups']
+
+        temp_arr = []
         for i in range(0,len(prev_arr)):
-            if(prev_arr[i]['group_id']==group_id):
-                prev_arr.pop(i)
+            if(prev_arr[i]['group_id']!=group_id):
+                temp_arr.append(prev_arr[i])
+        
+        prev_arr.clear()
+        for i in temp_arr:
+            prev_arr.append(i)
+
         cursor2 = database.user_col.find_one_and_update({'email':cursor2['email']},{'$set':{'created_groups':prev_arr}})
 
         # removing the group from the user obj of the participants   
@@ -88,9 +95,15 @@ def delete_group(group_id:str,current_user: User = Depends(oauth2.get_current_us
             try:
                 cursor = database.user_col.find_one({"email":part['email']})
                 new_array = cursor['invited_groups']
+                temp_new_arr = []
                 for i in range(0,len(new_array)):
-                    if(new_array[i]['group_id']==group_id):
-                        new_array.pop(i)
+                    if(new_array[i]['group_id']!=group_id):
+                        temp_new_arr.append(new_array[i])
+                
+                new_array.clear()
+                for i in temp_new_arr:
+                    new_array.append(i)
+
                 cursor2 = database.user_col.find_one_and_update({'email':part['email']},{'$set':{'invited_groups':new_array}})
             except:
                 continue
@@ -181,17 +194,26 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
     # try:
         # checking if admin is removing
         cursor = database.groups.find_one({'group_id':req.group_id})
+        print(cursor)
         if(cursor['admin']['email']!=current_user.email):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         part_arr = cursor['participants']
+        print(len(part_arr))
 
+        temp_part_arr = []
         # removing those participants from group info
         for p in range(0,len(part_arr)):
             if(part_arr[p]['email'] in req.email):
-                part_arr.pop(p)
+                # part_arr.pop(p)
+                continue
             else:
+                temp_part_arr.append(part_arr[p])
                 part_arr[p]['amount'] = float((cursor['amount']*1.0)/(len(part_arr)-1))
-        
+
+        part_arr.clear()
+        for i in temp_part_arr:
+            part_arr.append(i)
+
         # editing peoples participating
         for people in part_arr:
             try:
@@ -221,9 +243,15 @@ def remove_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current
                 # updating the participant invited group array
                 rem_arr.append(mails)
                 invited_arr = cursor1['invited_groups']
+                temp_n_arr = []
                 for grps in range(0,len(invited_arr)):
-                    if(invited_arr[grps]['group_id']==req.group_id):
-                        invited_arr.pop(grps)
+                    if(invited_arr[grps]['group_id']!=req.group_id):
+                        temp_n_arr.append(invited_arr[grps])
+
+                invited_arr.clear()
+                for i in temp_n_arr:
+                    invited_arr.append(i)
+
                 cursor2 = database.user_col.find_one_and_update({'email':mails},{'$set':{'invited_groups':invited_arr}})
             except:
                 continue
