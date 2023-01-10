@@ -21,7 +21,7 @@ def email(remail: str):
     message['From'] = sender_address
     message['To'] = receiver_address
     # The subject line
-    message['Subject'] = 'BudTracker Welcomes you to the family'
+    message['Subject'] = 'BudTrack Welcomes you to the family'
 
     # Setup the MIME
 
