@@ -8,6 +8,7 @@ export const Auth = ({ children }) => {
 
     const [loggedIn, setLogged] = useState(false);
     const [authLoading, setAuthLoading] = useState(true);
+    const [openCreate, setCreate] = React.useState(false);
 
     const setLoggedIn = (flag) => {
         !flag && setUser({})
@@ -16,10 +17,10 @@ export const Auth = ({ children }) => {
     }
 
     const [user, setUser] = useState({
-        email: localStorage.getItem('email') || '',
-        user_id: localStorage.getItem('user_id') || '',
-        access_token: localStorage.getItem('access_token') || '',
-        refresh_token: localStorage.getItem('refresh_token') || '',
+        email: localStorage.getItem('email') ? JSON.parse(localStorage.getItem('email')) : '',
+        user_id: localStorage.getItem('user_id') ? JSON.parse(localStorage.getItem('user_id')) : '',
+        access_token: localStorage.getItem('access_token') ? JSON.parse(localStorage.getItem('access_token')) : '',
+        refresh_token: localStorage.getItem('refresh_token') ? JSON.parse(localStorage.getItem('refresh_token')) : '',
     })
 
     const fetch_access = () => {
@@ -35,7 +36,7 @@ export const Auth = ({ children }) => {
             headers: {
                 'content-type': "application/json",
             },
-            body: JSON.stringify({ refresh_token: JSON.parse(user.refresh_token) })
+            body: JSON.stringify({ refresh_token: user.refresh_token })
         }
         fetch(url, msg_body)
             .then(res => {
@@ -73,7 +74,7 @@ export const Auth = ({ children }) => {
 
     useEffect(() => {
         setInterval(() => {
-            console.log("idk whats happening")
+            console.log("refreshing access_token")
             fetch_access();
         }, (1000 * 20 * 60));
 
@@ -81,7 +82,7 @@ export const Auth = ({ children }) => {
     }, []);
 
     return (
-        <Login.Provider value={{ loggedIn, setLoggedIn, authLoading, user, setUser }}>
+        <Login.Provider value={{ loggedIn, setLoggedIn, authLoading, user, setUser, openCreate, setCreate }}>
             {children}
         </Login.Provider>
     )
