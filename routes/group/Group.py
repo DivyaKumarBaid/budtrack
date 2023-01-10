@@ -17,7 +17,6 @@ def create_group(info:Create_group,current_user: User = Depends(oauth2.get_curre
 
         if cursor:
             # creating a group
-            print("inside")
             group_id = str(uuid.uuid4())
             new_array = cursor['created_groups']
             group_info = Stored_group(
@@ -29,18 +28,23 @@ def create_group(info:Create_group,current_user: User = Depends(oauth2.get_curre
                 participants=info.participants
             )
             new_array.insert(0,dict(group_info))
-            
+            # print(new_array)
             participants_email=[]
 
             # updating the participants invited group in user collection
             for part in info.participants:
-                if(part.email == info.admin.email):
-                    continue
-                cursor = database.user_col.find_one({"email":part.email})
-                participants_email.append(part.email)
-                new_array = cursor['invited_groups']
-                new_array.insert(0,dict(group_info))
-                cursor2 = database.user_col.find_one_and_update({'email':part.email},{'$set':{'invited_groups':new_array}})
+                if(part.email != info.admin.email):
+                    try:
+                        cursor = database.user_col.find_one({"email":part.email})
+                        new_array_part = cursor['invited_groups']
+                        new_array_part.insert(0,dict(group_info))
+                        cursor2 = database.user_col.find_one_and_update({'email':part.email},{'$set':{'invited_groups':new_array_part}})
+                        participants_email.append(part.email)
+                    except:
+                        participants_email.append(part.email)
+                else:
+                    participants_email.append(part.email)
+
             
             # updating the group creators user collection created groups
             if(len(participants_email)>0):
