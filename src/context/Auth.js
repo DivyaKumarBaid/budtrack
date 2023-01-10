@@ -50,7 +50,7 @@ export const Auth = ({ children }) => {
                 !loggedIn && setLoggedIn(true);
                 localStorage.setItem('access_token', JSON.stringify(data));
                 setUser(prev => {
-                    return { ...prev, access_token: data }
+                    return { ...prev, access_token: data.access_token }
                 })
                 setAuthLoading(false);
             })
