@@ -166,12 +166,15 @@ def add_user(req:Req_user_add,current_user: User = Depends(oauth2.get_current_us
 
         # for already existing people
         for mails in cursor['participants']:
-            existing_cursor = database.user_col.find_one({'email':mails['email']})
-            existing_grps = existing_cursor['invited_groups']
-            for grps in range(0,len(existing_grps)):
-                if(existing_grps[grps]['group_id'] == req.group_id):
-                    existing_grps[grps]['participants'] = part_arr
-            cursor2 = database.user_col.find_one_and_update({'email':mails['email']},{'$set':{'invited_groups':existing_grps}})
+            try:
+                existing_cursor = database.user_col.find_one({'email':mails['email']})
+                existing_grps = existing_cursor['invited_groups']
+                for grps in range(0,len(existing_grps)):
+                    if(existing_grps[grps]['group_id'] == req.group_id):
+                        existing_grps[grps]['participants'] = part_arr
+                cursor2 = database.user_col.find_one_and_update({'email':mails['email']},{'$set':{'invited_groups':existing_grps}})
+            except:
+                continue
         
         # for admin
         existing_cursor = database.user_col.find_one({'email':cursor['admin']['email']})

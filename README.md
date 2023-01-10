@@ -1,6 +1,7 @@
 # budtrack
 Hosted Url : https://wvkfik.deta.dev
-Docs : https://wvkfik.deta.dev/docs
+<br>
+Docs : https://04jztg.deta.dev
 
 Use
 ```git clone <url>```
