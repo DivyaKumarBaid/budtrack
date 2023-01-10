@@ -19,6 +19,7 @@ export const View = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [loading, setLoading] = React.useState(true)
     const [userDetails, setDetails] = React.useState({})
+    const [subload, setSubLoad] = React.useState(false);
 
     const [groupInfo, setInfo] = React.useState({
         amount: 0,
@@ -117,27 +118,13 @@ export const View = () => {
             enqueueSnackbar('Subject is Missing', { variant: 'error' })
             return false
         }
-        // setAdded((prev) => {
-        //     const new_arr = prev.forEach((item) => {
-        //         return { ...item, amount: (groupInfo.amount / added.length) }
-        //     })
-        //     return new_arr
-        // })
+        setSubLoad(true);
 
         const new_arr = added.map(item => {
             return { ...item, amount: (groupInfo.amount / added.length) }
         })
 
-        console.log("added", new_arr)
-
-        // setInfo((prev) => {
-        //     return { ...prev, participants: new_arr, admin: { ...prev.admin, amount: prev.amount } }
-        // })
-
         const cred = { ...groupInfo, participants: new_arr, admin: { ...groupInfo.admin, amount: groupInfo.amount } }
-
-
-        console.log("groupInfo", cred)
 
         let msg_body = {
             method: 'POST',
@@ -152,6 +139,7 @@ export const View = () => {
 
         fetch(url, msg_body)
             .then(res => {
+                setSubLoad(false);
                 if (res.status !== 200 && res.status !== 201 && res.status !== 202) {
                     throw Error('UnAuthorised')
                 }
@@ -299,9 +287,9 @@ export const View = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => closeDialogue()}>Cancel</Button>
-                        <Button onClick={() => {
+                        {subload ? <CircularProgress style={{ width: '15px', height: '15px' }} color="inherit" /> : <Button onClick={() => {
                             create_group_submit() && closeDialogue()
-                        }}>Create</Button>
+                        }}>Create</Button>}
                     </DialogActions>
                 </Dialog>
                 <div>
