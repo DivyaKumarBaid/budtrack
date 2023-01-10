@@ -117,15 +117,27 @@ export const View = () => {
             enqueueSnackbar('Subject is Missing', { variant: 'error' })
             return false
         }
-        setAdded((prev) => prev.map((pre) => {
-            return ({ ...pre, amount: (groupInfo.amount / added.length) })
-        }))
+        // setAdded((prev) => {
+        //     const new_arr = prev.forEach((item) => {
+        //         return { ...item, amount: (groupInfo.amount / added.length) }
+        //     })
+        //     return new_arr
+        // })
 
-        setInfo((prev) => {
-            return { ...prev, participants: [...added], admin: { ...prev.admin, amount: prev.amount } }
+        const new_arr = added.map(item => {
+            return { ...item, amount: (groupInfo.amount / added.length) }
         })
 
-        console.log("groupInfo", groupInfo)
+        console.log("added", new_arr)
+
+        // setInfo((prev) => {
+        //     return { ...prev, participants: new_arr, admin: { ...prev.admin, amount: prev.amount } }
+        // })
+
+        const cred = { ...groupInfo, participants: new_arr, admin: { ...groupInfo.admin, amount: groupInfo.amount } }
+
+
+        console.log("groupInfo", cred)
 
         let msg_body = {
             method: 'POST',
@@ -133,7 +145,7 @@ export const View = () => {
                 'Authorization': "Bearer " + user.access_token,
                 'content-type': "application/json"
             },
-            body: JSON.stringify(groupInfo)
+            body: JSON.stringify(cred)
         }
 
         let url = process.env.REACT_APP_BASE_URL + '/group/create'
@@ -165,7 +177,6 @@ export const View = () => {
     React.useEffect(() => {
         fetch_details();
     }, [])
-
 
     return (
         loading ?
@@ -251,7 +262,7 @@ export const View = () => {
                                         return <></>
                                 })}
                             </div>
-                            {fieldEmail === '' &&
+                            {fieldEmail !== '' &&
                                 <div className="profile-wrapper"
                                     onClick={() => {
                                         setAdded((prev) => {
