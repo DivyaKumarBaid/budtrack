@@ -422,5 +422,11 @@
   .Logonav-container img{
     width: 20vw;
   }
+  .created-group-wrapper{
+    flex-direction: column;
+  }
+  .group-card{
+    width: 85vw;
+  }
 }
 /* media query */
